@@ -46,6 +46,16 @@ order by id desc
 limit 10;
 ```
 
+## Launch the interface
+
+The Streamlit interface lets you trigger a scrape and browse, search, filter, and sort the books stored in Supabase:
+
+```sh
+streamlit run app.py
+```
+
+Open the local URL printed in the terminal (usually `http://localhost:8501`). Keep `.env` in this project folder so the interface can connect to Supabase. The interface uses the same scraper and database table as the command-line workflow.
+
 ## Schema and “schema”
 
 The database schema is the table's structure: its columns, types, constraints, and access policies. `schema.sql` creates that structure before the scraper writes data. The scraper's field names and types correspond to these columns; `source_url` is unique so that upserts don't create duplicates.
