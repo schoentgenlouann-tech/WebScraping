@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from httpx import HTTPError
 from postgrest.exceptions import APIError
 
-from scraper import get_supabase_client, save_books, scrape_books
+from scraper import get_supabase_client, get_supabase_write_client, save_books, scrape_books
 
 load_dotenv()
 
@@ -35,7 +35,7 @@ with st.sidebar:
     scrape_limit = st.slider("Books to collect", min_value=1, max_value=100, value=10)
     if st.button("Scrape and save", type="primary", use_container_width=True):
         try:
-            supabase = get_supabase_client()
+            supabase = get_supabase_write_client()
             with st.spinner(f"Collecting up to {scrape_limit} books..."):
                 new_books = scrape_books(scrape_limit)
                 if not new_books:

@@ -11,13 +11,13 @@ create table if not exists public.books (
 );
 
 alter table public.books enable row level security;
-grant select, insert, update on public.books to anon;
+revoke all on public.books from anon;
+grant select on public.books to anon;
 
--- Use a publishable/anon key with this policy for this public, educational dataset.
 drop policy if exists "Allow anonymous book reads and inserts" on public.books;
-create policy "Allow anonymous book reads and inserts"
+drop policy if exists "Allow anonymous book reads" on public.books;
+create policy "Allow anonymous book reads"
     on public.books
-    for all
+    for select
     to anon
-    using (true)
-    with check (true);
+    using (true);

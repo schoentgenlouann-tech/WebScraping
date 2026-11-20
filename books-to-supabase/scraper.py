@@ -9,6 +9,8 @@ from urllib.parse import urljoin
 import requests
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
+from httpx import HTTPError
+from postgrest.exceptions import APIError
 from supabase import Client, create_client
 
 BASE_URL = "https://books.toscrape.com/"
@@ -71,6 +73,17 @@ def get_supabase_client() -> Client:
     return create_client(url, key)
 
 
+def get_supabase_write_client() -> Client:
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_WRITE_KEY")
+    if not url or not key:
+        raise RuntimeError(
+            "Set SUPABASE_URL and SUPABASE_WRITE_KEY in the environment or .env file. "
+            "The write key must stay server-side and must not be committed."
+        )
+    return create_client(url, key)
+
+
 def check_supabase_connection(client: Client) -> None:
     client.table("books").select("id").limit(1).execute()
 
@@ -91,26 +104,25 @@ def main() -> int:
     )
     args = parser.parse_args()
 
-    try:
-        supabase = get_supabase_client()
-    except RuntimeError as exc:
-        print(f"Error: {exc}", file=sys.stderr)
-        return 1
-
     if args.check_connection:
-        check_supabase_connection(supabase)
+        try:
+            check_supabase_connection(get_supabase_client())
+        except (APIError, HTTPError, RuntimeError) as exc:
+            print(f"Connection check failed: {exc}", file=sys.stderr)
+            return 1
         print("Supabase connection OK: read from public.books.")
         return 0
 
     try:
+        supabase = get_supabase_write_client()
         books = scrape_books(args.limit)
-    except (requests.RequestException, ValueError) as exc:
-        print(f"Scrape failed: {exc}", file=sys.stderr)
+        if not books:
+            print("No books found; nothing was written.", file=sys.stderr)
+            return 1
+        save_books(supabase, books)
+    except (APIError, HTTPError, requests.RequestException, RuntimeError, ValueError) as exc:
+        print(f"Scrape/save failed: {exc}", file=sys.stderr)
         return 1
-    if not books:
-        print("No books found; nothing was written.", file=sys.stderr)
-        return 1
-    save_books(supabase, books)
     print(f"Upserted {len(books)} books into public.books.")
     return 0
 

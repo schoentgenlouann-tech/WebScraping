@@ -14,7 +14,7 @@ The scraper sends HTTP GET requests to the Books to Scrape catalog. It parses th
 
 Book records are stored in the Supabase table `public.books`. The table also records the source URL and scrape timestamp. `source_url` is unique, and the scraper upserts by that field so repeated runs update existing records instead of making duplicates.
 
-The Supabase URL and publishable (or legacy anon) key are read from a local `.env` file. The supplied schema enables row-level security but grants anonymous access for this public educational dataset. Do not use this broad policy for private or production data, and never put a service-role/secret key in the app or commit it to Git.
+The supplied schema enables row-level security and gives the anonymous role read-only access. The Python scraper and Streamlit server use a separate service-role/secret key for writes. That key bypasses row-level security: keep it in the server's environment, never expose it to browser code, and never commit or share it.
 
 ## User interaction
 
@@ -39,20 +39,29 @@ Requirements: Python 3.9 or later and a Supabase project.
    pip install -r requirements.txt
    ```
 
-2. In your Supabase project's **SQL Editor**, run [`schema.sql`](./schema.sql). Confirm that `public.books` appears in **Table Editor**.
-3. Create a `.env` file in this directory with your project URL and publishable key (or legacy anon key):
+2. Copy the example configuration:
+
+   ```sh
+   cp .env.example .env
+   ```
+
+3. Edit `.env` with your Supabase URL, publishable key (or legacy anon key), and server-side write key:
 
    ```dotenv
    SUPABASE_URL=https://your-project-id.supabase.co
    SUPABASE_KEY=your-publishable-key
+   SUPABASE_WRITE_KEY=your-server-side-secret-key
    ```
 
-   Keep `.env` private and do not use a secret or service-role key.
-4. Verify the connection:
+   Use a publishable/anon key for `SUPABASE_KEY` and a service-role/secret key for `SUPABASE_WRITE_KEY`. Keep `.env` private. The write key is only for the Python server and must never be exposed in a browser or committed to Git.
+4. In your Supabase project's **SQL Editor**, run [`schema.sql`](./schema.sql). For an existing table, this replaces the previous anonymous write policy with read-only access; it does not change book rows. Confirm that `public.books` appears in **Table Editor**.
+5. Verify anonymous read access:
 
    ```sh
    python scraper.py --check-connection
    ```
+
+Scraping and saving books uses `SUPABASE_WRITE_KEY`; add it before using the CLI or dashboard's **Scrape and save** button.
 
 ### Run the scraper
 
