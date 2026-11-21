@@ -1,0 +1,1 @@
+**Technical complexity is not a grading criterion.** Disclose incomplete work honestly. We grade how you follow the process and respond to findings, rather than whether the assistant declares your project safe, so basically being honest about what still would need improvement.
