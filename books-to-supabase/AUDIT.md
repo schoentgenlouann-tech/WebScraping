@@ -56,7 +56,15 @@ No credential values are recorded in this report.
 
 ## Follow-up validation — 2026-11-26
 
-The audit follow-up added explicit test coverage for use of the public read key and corrected the dashboard's guidance for rejected write requests. Validation results:
+### Project actions completed
+
+- Updated [`app.py`](./app.py) so dashboard write failures point users to the server-side write key and table policies, rather than the public publishable key.
+- Added a unit test in [`tests/test_scraper.py`](./tests/test_scraper.py) confirming the read client uses the public `SUPABASE_KEY`, alongside the existing server-side write-key tests.
+- Updated the audit, remediation, and open-work records to capture current validation results and outstanding actions.
+- Ran a dependency advisory scan. Dependency upgrades were not applied because the configured package index did not offer all reported fixed releases.
+- Exercised the live read and write paths: reads succeed; the one-record write attempt is rejected with HTTP 401. The hosted database migration and a successful write remain incomplete.
+
+### Validation results
 
 - All 7 unit tests pass; Python syntax checks and `pip check` pass.
 - The live anonymous read connection succeeds.
