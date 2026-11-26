@@ -83,6 +83,14 @@ Repository-level and follow-up validation reported:
 
 These checks do not prove that the hosted database is configured correctly or that live writes succeed.
 
+### 2026-11-26 follow-up
+
+- The 7 unit tests pass, including explicit public-read/write-key separation coverage.
+- Python syntax and `pip check` validation pass.
+- The live anonymous read connection succeeds.
+- A one-record live write attempt fails with HTTP 401 (`Invalid API key`), confirming the configured write credential is still not accepted.
+- An installed-environment advisory scan found 84 known vulnerability records across 12 packages. The configured package index did not offer every patched release reported by the scanner, so package remediation remains an environment and dependency follow-up rather than a code-secret issue.
+
 ## Remaining limitations
 
 ### Live write credentials

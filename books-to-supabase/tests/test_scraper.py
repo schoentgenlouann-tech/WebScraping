@@ -2,7 +2,13 @@ import os
 import unittest
 from unittest.mock import Mock, patch
 
-from scraper import get_supabase_write_client, parse_listing, save_books, scrape_books
+from scraper import (
+    get_supabase_client,
+    get_supabase_write_client,
+    parse_listing,
+    save_books,
+    scrape_books,
+)
 
 
 def listing_html(count=6):
@@ -23,6 +29,21 @@ def listing_html(count=6):
 
 
 class ScraperTests(unittest.TestCase):
+    @patch("scraper.create_client")
+    def test_read_client_uses_public_read_key(self, create_client):
+        environment = {
+            "SUPABASE_URL": "https://example.supabase.co",
+            "SUPABASE_KEY": "test-public-read-key",
+        }
+        with patch.dict(os.environ, environment, clear=True):
+            client = get_supabase_client()
+
+        create_client.assert_called_once_with(
+            "https://example.supabase.co",
+            "test-public-read-key",
+        )
+        self.assertIs(client, create_client.return_value)
+
     @patch("scraper.create_client")
     def test_write_client_uses_server_side_key(self, create_client):
         environment = {

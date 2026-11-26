@@ -26,5 +26,6 @@
 1. Replace `SUPABASE_WRITE_KEY` in the ignored local `.env` with a valid server-side service-role/secret key for the same Supabase project. Do not share or commit it.
 2. Apply [`schema.sql`](./schema.sql) in the Supabase SQL Editor. The hosted database policy has not been changed by this repository update; the dashboard requires an authenticated session.
 3. Restart Streamlit, rerun `python scraper.py --check-connection`, and test **Scrape and save** after steps 1 and 2. The write path has not yet been verified successfully.
+4. Re-run a dependency-advisory scan and upgrade packages when patched releases are available from the configured package index.
 
 The local `.env` was not inspected or included in this report.

@@ -21,7 +21,7 @@ def show_error(action: str, error: Exception) -> None:
             "in the Supabase dashboard; if it is paused, resume it, then retry."
         )
     elif str(error.code) in {"401", "403"}:
-        st.info("Supabase denied the request. Check the publishable key and table access policies.")
+        st.info("Supabase denied the request. Check the server-side write key and table access policies.")
     else:
         st.info("Check the Supabase table, schema, and access policies.")
 
