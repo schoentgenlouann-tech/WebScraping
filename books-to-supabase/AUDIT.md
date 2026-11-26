@@ -49,7 +49,19 @@ A previously shared screenshot showed a Supabase publishable key. This key type 
 - The local `.env` contents were not inspected, so the exact credential type and value were not verified.
 - The live Supabase project's current RLS policies and settings were not independently checked or changed.
 - The local `.env` was not inspected; the presence or validity of `SUPABASE_WRITE_KEY` is unverified.
-- No dependency-advisory scan was run. Project tests were not run during the read-only audit; they were run separately to validate the follow-up code changes.
+- No dependency-advisory scan was run during the original audit. Project tests were not run during that read-only audit; they were run separately to validate follow-up code changes.
 - The repository alone cannot prove the provenance of code or independently confirm the statement that no external snippets were copied.
 
 No credential values are recorded in this report.
+
+## Follow-up validation — 2026-11-26
+
+The audit follow-up added explicit test coverage for use of the public read key and corrected the dashboard's guidance for rejected write requests. Validation results:
+
+- All 7 unit tests pass; Python syntax checks and `pip check` pass.
+- The live anonymous read connection succeeds.
+- A live one-record scrape/save attempt still fails with HTTP 401 (`Invalid API key`). A successful hosted write has not been demonstrated.
+- A dependency advisory scan of the installed environment reported 84 known vulnerability records across 12 packages. The configured package index did not offer all fixed releases reported by the scanner, so dependency remediation remains open.
+- The live database migration remains unverified and must be applied in the Supabase project; repository changes alone do not update hosted policies.
+
+No secrets were read, recorded, or included in this follow-up.
